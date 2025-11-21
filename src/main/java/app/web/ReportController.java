@@ -39,4 +39,10 @@ public class ReportController {
         ReportResponse created = reportService.createReport(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReport(@PathVariable UUID id) {
+        reportService.deleteReport(id);
+        return ResponseEntity.noContent().build();
+    }
 }

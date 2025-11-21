@@ -6,6 +6,7 @@ import app.repository.ReportRepository;
 import app.web.dto.CreateReportRequest;
 import app.web.dto.ReportResponse;
 import app.web.mapper.ReportMapper;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +41,14 @@ public class ReportService {
         Report report = ReportMapper.mapFromCreateRequestToReport(request);
         reportRepository.save(report);
         return ReportMapper.mapFromReportToResponse(report);
+    }
+
+    @Transactional
+    public void deleteReport(UUID id) {
+        Report report = reportRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ReportNotFoundException("Report not found"));
+
+        report.setDeleted(true);
+        reportRepository.save(report);
     }
 }
