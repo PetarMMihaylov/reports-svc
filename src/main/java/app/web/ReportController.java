@@ -1,7 +1,9 @@
 package app.web;
 
 import app.service.ReportService;
+import app.web.dto.CreateReportRequest;
 import app.web.dto.ReportResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,5 +32,11 @@ public class ReportController {
 
         ReportResponse report = reportService.getReportById(id);
         return ResponseEntity.ok(report);
+    }
+
+    @PostMapping
+    public ResponseEntity<ReportResponse> createReport(@RequestBody CreateReportRequest request) {
+        ReportResponse created = reportService.createReport(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 }
