@@ -33,16 +33,16 @@ public class Report {
     private LocalDate endDate;
 
     @Column(nullable = false)
-    private Integer totalClaims;
+    private int totalClaims;
 
     @Column(nullable = false)
-    private Integer totalApprovedClaims;
+    private int totalApprovedClaims;
 
     @Column(nullable = false)
     private BigDecimal totalReimbursedAmount;
 
     @Column(nullable = false)
-    private Integer totalTransactions;
+    private int totalTransactions;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
