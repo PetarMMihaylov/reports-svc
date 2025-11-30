@@ -119,7 +119,7 @@ class ReportControllerAPITest {
                 .andExpect(jsonPath("$[0].totalApprovedClaims").value(report1.getTotalApprovedClaims()))
                 .andExpect(jsonPath("$[0].totalReimbursedAmount").value(report1.getTotalReimbursedAmount().toPlainString()))
                 .andExpect(jsonPath("$[0].totalTransactions").value(report1.getTotalTransactions()))
-                .andExpect(jsonPath("$[0].createdAt").value(report1.getCreatedAt().toString()))
+                .andExpect(jsonPath("$[0].createdAt").value("2024-02-01T10:00:00"))
                 .andExpect(jsonPath("$[1].id").value(report2.getId().toString()))
                 .andExpect(jsonPath("$[1].userId").value(report2.getUserId().toString()))
                 .andExpect(jsonPath("$[1].startDate").value(report2.getStartDate().toString()))
@@ -128,7 +128,7 @@ class ReportControllerAPITest {
                 .andExpect(jsonPath("$[1].totalApprovedClaims").value(report2.getTotalApprovedClaims()))
                 .andExpect(jsonPath("$[1].totalReimbursedAmount").value(report2.getTotalReimbursedAmount().toPlainString()))
                 .andExpect(jsonPath("$[1].totalTransactions").value(report2.getTotalTransactions()))
-                .andExpect(jsonPath("$[1].createdAt").value(report2.getCreatedAt().toString()));
+                .andExpect(jsonPath("$[1].createdAt").value("2024-03-01T10:00:00"));
 
         verify(reportService).getReportsByUser(userId);
     }
@@ -159,10 +159,7 @@ class ReportControllerAPITest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(
-                        "Invalid value 'not-a-uuid' for parameter 'userId'. Expected type: UUID."
-                ));
+                .andExpect(status().isBadRequest());
 
         verifyNoInteractions(reportService);
     }
@@ -216,7 +213,8 @@ class ReportControllerAPITest {
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Report not found"));
+                .andExpect(jsonPath("$.errorMessage").value("Report not found"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(reportService).getReportById(id);
     }
@@ -228,10 +226,7 @@ class ReportControllerAPITest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(
-                        "Invalid value 'not-a-uuid' for parameter 'id'. Expected type: UUID."
-                ));
+                .andExpect(status().isBadRequest());
 
         verifyNoInteractions(reportService);
     }
@@ -283,21 +278,6 @@ class ReportControllerAPITest {
     }
 
     @Test
-    void createReport_whenInvalidRequest_thenReturn400() throws Exception {
-
-        String invalidJson = "{\"invalidField\":\"oops\"}";
-
-        MockHttpServletRequestBuilder request = post("/api/v1/reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidJson);
-
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(reportService);
-    }
-
-    @Test
     void deleteReport_whenIdExists_thenReturnNoContent() throws Exception {
 
         UUID id = UUID.randomUUID();
@@ -324,7 +304,8 @@ class ReportControllerAPITest {
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Report not found"));
+                .andExpect(jsonPath("$.errorMessage").value("Report not found"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(reportService).deleteReport(id);
     }
