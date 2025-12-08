@@ -24,6 +24,7 @@ public class ReportService {
     }
 
     public List<ReportResponse> getReportsByUser(UUID userId) {
+
         return reportRepository.findByUserIdAndDeletedFalse(userId)
                 .stream()
                 .map(ReportMapper::mapFromReportToResponse)
@@ -31,6 +32,7 @@ public class ReportService {
     }
 
     public ReportResponse getReportById(UUID id) {
+
         Report report = reportRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ReportNotFoundException("Report not found"));
 
@@ -38,17 +40,23 @@ public class ReportService {
     }
 
     public ReportResponse createReport(CreateReportRequest request) {
+
         Report report = ReportMapper.mapFromCreateRequestToReport(request);
         reportRepository.save(report);
+
+        log.info("Created report {} for user {}.", report.getId(), report.getUserId());
         return ReportMapper.mapFromReportToResponse(report);
     }
 
     @Transactional
     public void deleteReport(UUID id) {
+
         Report report = reportRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ReportNotFoundException("Report not found"));
 
         report.setDeleted(true);
         reportRepository.save(report);
+
+        log.info("Soft-deleted report {} for user {}.", report.getId(), report.getUserId());
     }
 }
